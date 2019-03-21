@@ -22,11 +22,11 @@ The file follows the following format:
      Any command that requires arguments must have those arguments in the second line.
      The commands are as follows:
 
-         sphere: add a sphere to the edge matrix - 
+         sphere: add a sphere to the edge matrix -
                  takes 4 arguemnts (cx, cy, cz, r)
-         torus: add a torus to the edge matrix - 
+         torus: add a torus to the edge matrix -
                 takes 5 arguemnts (cx, cy, cz, r1, r2)
-         box: add a rectangular prism to the edge matrix - 
+         box: add a rectangular prism to the edge matrix -
               takes 6 arguemnts (x, y, z, width, height, depth)
          clear: clears the edge matrix
 
@@ -77,13 +77,13 @@ void parse_file ( char * filename,
   color c;
   c.red = 255;
   c.green = 0;
-  c.blue = 255;
-  
-  if ( strcmp(filename, "stdin") == 0 ) 
+  c.blue = 0;
+
+  if ( strcmp(filename, "stdin") == 0 )
     f = stdin;
   else
     f = fopen(filename, "r");
-  
+
   while ( fgets(line, sizeof(line), f) != NULL ) {
     line[strlen(line)-1]='\0';
     //printf(":%s:\n",line);
@@ -112,7 +112,7 @@ void parse_file ( char * filename,
         type = HERMITE;
       else
         type = BEZIER;
-      
+
       fgets(line, sizeof(line), f);
       //printf("CURVE\t%s", line);
 
@@ -124,7 +124,7 @@ void parse_file ( char * filename,
           /*       xvals[1], yvals[1], */
           /*       xvals[2], yvals[2], */
           /*       xvals[3], yvals[3]); */
-      
+
           //printf("%d\n", type);
           add_curve( edges, xvals[0], yvals[0], xvals[1], yvals[1],
                      xvals[2], yvals[2], xvals[3], yvals[3], step, type);
@@ -209,5 +209,45 @@ void parse_file ( char * filename,
       draw_lines(edges, s, c);
       save_extension(s, line);
     }//end save
+
+    else if( strncmp(line, "box",strlen(line)) == 0){
+        fgets(line,sizeof(line),f);
+        double w,h,d;
+        sscanf(line, "%lf %lf %lf %lf %lf %lf",xvals, yvals, zvals, &w,&h,&d);
+        add_box(edges,xvals[0],yvals[0],zvals[0],w,h,d);
+    }
+
+    else if( strncmp(line, "sphere",strlen(line)) == 0){
+      fgets(line,sizeof(line),f);
+      sscanf(line,"%lf %lf %lf %lf",xvals,yvals,zvals,&r);
+      add_sphere(edges,xvals[0],yvals[0],zvals[0],r,step);
+
+    }
+
+    else if( strncmp(line, "torus",strlen(line)) == 0){
+      double r2;
+      fgets(line,sizeof(line),f);
+      sscanf(line,"%lf %lf %lf %lf %lf",xvals,yvals,zvals,&r,&r2);
+      add_torus(edges,xvals[0],yvals[0],zvals[0],r,r2,step);
+
+    }
+
+    else if( strncmp(line, "clear",strlen(line)) == 0){
+      free_matrix(edges);
+      edges = new_matrix(4,0);
+    }
+
+    else if( strncmp(line, "clear",strlen(line)) == 0){
+      free_matrix(edges);
+      edges = new_matrix(4,0);
+    }
+
+    else if( strncmp(line, "clear",strlen(line)) == 0){
+      free_matrix(edges);
+      free_matrix(transform);
+      exit(0);
+
+    }
+
   }
 }
